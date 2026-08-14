@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Predictions — Nakshatra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #F3EFE4; --ink-dim: #C9C3B2; --ink-faint: #8B8676;
+    --night: #10142A; --night-2: #161B33;
+    --gold: #C9932E; --gold-soft: #E0B667;
+    --line: rgba(243,239,228,0.12);
+    --serif: 'Fraunces', serif; --sans: 'Inter', sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ background:var(--night); color:var(--ink); font-family:var(--sans); line-height:1.6; }
+  a{color:inherit; text-decoration:none;}
+
+  nav{ display:flex; align-items:center; justify-content:space-between; max-width:1100px; margin:0 auto; padding:28px 24px; border-bottom:1px solid var(--line); }
+  .brand{ font-family:var(--serif); font-size:22px; font-weight:500; }
+  .brand em{ color:var(--gold-soft); font-style:normal; }
+  .nav-links{ display:flex; gap:36px; font-size:14px; color:var(--ink-dim); }
+  .nav-links a.active{ color:var(--gold-soft); }
+  .nav-links a:hover{ color:var(--gold-soft); }
+  .btn-outline{ border:1px solid var(--line); border-radius:2px; padding:9px 18px; font-size:13px; }
+  .btn-outline:hover{ border-color:var(--gold); }
+
+  main{ max-width:900px; margin:0 auto; padding:48px 24px 100px; }
+  .page-head h1{ font-family:var(--serif); font-size:28px; font-weight:500; }
+  .page-head p{ color:var(--ink-dim); font-size:14px; margin-top:8px; }
+
+  .cat-row{ display:flex; gap:8px; margin:32px 0 36px; flex-wrap:wrap; }
+  .cat{ font-size:12.5px; color:var(--ink-dim); padding:8px 16px; border:1px solid var(--line); border-radius:20px; cursor:pointer; }
+  .cat.active{ color:var(--night); background:var(--gold-soft); border-color:var(--gold-soft); font-weight:500; }
+
+  .pred-grid{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line); }
+  @media (max-width:700px){ .pred-grid{ grid-template-columns:1fr; } }
+  .pred-card{ background:var(--night); padding:26px 28px; }
+  .pred-head{ display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  .pred-icon{ width:6px; height:6px; border-radius:50%; background:var(--gold); }
+  .pred-title{ font-family:var(--serif); font-size:17px; }
+  .pred-body{ font-size:13.5px; color:var(--ink-dim); line-height:1.75; }
+
+  .note-band{
+    margin-top:40px; border-left:2px solid var(--gold); background:rgba(201,147,46,0.06);
+    padding:18px 22px; font-size:13px; color:var(--ink-dim);
+  }
+
+  footer{ border-top:1px solid var(--line); padding:36px 24px; text-align:center; color:var(--ink-dim); font-size:13px; max-width:1100px; margin:0 auto; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">Naksh<em>atra</em></div>
+  <div class="nav-links">
+    <a href="kundli.html">Kundli</a>
+    <a href="dasha.html">Dasha</a>
+    <a href="jaimini-kp.html">Jaimini &amp; KP</a>
+    <a href="predictions.html" class="active">Predictions</a>
+  </div>
+  <a href="signin.html" class="btn-outline">Sign in</a>
+</nav>
+
+<main>
+  <div class="page-head">
+    <h1>Predictions</h1>
+    <p>Cecil Gupta &middot; drawn from lagna, nakshatra, and house lordships.</p>
+  </div>
+
+  <div class="cat-row">
+    <div class="cat active">General</div>
+    <div class="cat">Nakshatra</div>
+    <div class="cat">House-wise</div>
+    <div class="cat">Health</div>
+    <div class="cat">Career</div>
+    <div class="cat">Relationships</div>
+  </div>
+
+  <div class="pred-grid">
+    <div class="pred-card">
+      <div class="pred-head"><div class="pred-icon"></div><div class="pred-title">Character</div></div>
+      <div class="pred-body">Strong-willed and quietly intense, with a drive that holds steady under pressure. Loyalty runs deep once earned, and leadership tends to come through resolve rather than persuasion.</div>
+    </div>
+    <div class="pred-card">
+      <div class="pred-head"><div class="pred-icon"></div><div class="pred-title">Mind &amp; temperament</div></div>
+      <div class="pred-body">Sharp and probing, drawn to what lies beneath the surface. Views form firmly once settled, and there's a natural pull toward research or the lesser-explored.</div>
+    </div>
+    <div class="pred-card">
+      <div class="pred-head"><div class="pred-icon"></div><div class="pred-title">Career</div></div>
+      <div class="pred-body">Research, technical fields, or precision-driven work suit you well. Recognition tends to build gradually — a slow, compounding kind of success rather than a sudden rise.</div>
+    </div>
+    <div class="pred-card">
+      <div class="pred-head"><div class="pred-icon"></div><div class="pred-title">Relationships</div></div>
+      <div class="pred-body">Bonds form slowly but run deep once formed. A partner who respects your need for space will find you steady, protective, and quietly devoted in return.</div>
+    </div>
+    <div class="pred-card">
+      <div class="pred-head"><div class="pred-icon"></div><div class="pred-title">Health</div></div>
+      <div class="pred-body">The chart favours the heart and spine for attention over time. Regular movement and a disciplined pace matter more here than intensity.</div>
+    </div>
+    <div class="pred-card">
+      <div class="pred-head"><div class="pred-icon"></div><div class="pred-title">Wealth</div></div>
+      <div class="pred-body">Steady accumulation is favoured over windfalls. Property and long-term holdings serve better than speculative moves.</div>
+    </div>
+  </div>
+
+  <div class="note-band">
+    These readings summarise classical Vedic principles applied to your chart. For a complete house-by-house and dasha-linked interpretation, view the full report.
+  </div>
+</main>
+
+<footer>
+  Nakshatra — built on classical Vedic and Jaimini calculation methods.
+</footer>
+
+</body>
+</html>

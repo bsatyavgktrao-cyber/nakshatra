@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shadbala — Nakshatra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #F3EFE4; --ink-dim: #C9C3B2; --ink-faint: #8B8676;
+    --night: #10142A; --night-2: #161B33;
+    --gold: #C9932E; --gold-soft: #E0B667; --copper: #9A4B37;
+    --line: rgba(243,239,228,0.12);
+    --serif: 'Fraunces', serif; --sans: 'Inter', sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ background:var(--night); color:var(--ink); font-family:var(--sans); line-height:1.6; }
+  a{color:inherit; text-decoration:none;}
+
+  nav{ display:flex; align-items:center; justify-content:space-between; max-width:1100px; margin:0 auto; padding:28px 24px; border-bottom:1px solid var(--line); }
+  .brand{ font-family:var(--serif); font-size:22px; font-weight:500; }
+  .brand em{ color:var(--gold-soft); font-style:normal; }
+  .nav-links{ display:flex; gap:36px; font-size:14px; color:var(--ink-dim); }
+  .nav-links a.active{ color:var(--gold-soft); }
+  .nav-links a:hover{ color:var(--gold-soft); }
+  .btn-outline{ border:1px solid var(--line); border-radius:2px; padding:9px 18px; font-size:13px; }
+  .btn-outline:hover{ border-color:var(--gold); }
+
+  main{ max-width:900px; margin:0 auto; padding:48px 24px 100px; }
+  .page-head h1{ font-family:var(--serif); font-size:28px; font-weight:500; }
+  .page-head p{ color:var(--ink-dim); font-size:14px; margin-top:8px; }
+
+  .bar-panel{ background:var(--night-2); border:1px solid var(--line); border-radius:4px; padding:32px; margin-top:32px; }
+  .bar-row{ display:grid; grid-template-columns:90px 1fr 70px; align-items:center; gap:16px; margin-bottom:18px; }
+  .bar-row:last-child{ margin-bottom:0; }
+  .bar-label{ font-size:13px; }
+  .bar-track{ height:8px; background:var(--night); border-radius:6px; overflow:hidden; }
+  .bar-fill{ height:100%; background:var(--gold); border-radius:6px; }
+  .bar-fill.weak{ background:var(--copper); }
+  .bar-value{ font-size:12px; color:var(--ink-dim); text-align:right; }
+  .baseline{ position:relative; margin-top:10px; padding-top:8px; border-top:1px dashed var(--line); font-size:11px; color:var(--ink-faint); }
+
+  .verdict-grid{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line); margin-top:1px; }
+  @media (max-width:640px){ .verdict-grid{ grid-template-columns:1fr; } }
+  .verdict-cell{ background:var(--night); padding:20px 22px; }
+  .verdict-planet{ font-family:var(--serif); font-size:15px; margin-bottom:4px; }
+  .verdict-planet.strong{ color:var(--gold-soft); }
+  .verdict-planet.weak{ color:var(--copper); }
+  .verdict-text{ font-size:12.5px; color:var(--ink-dim); line-height:1.6; }
+
+  .note{ font-size:11.5px; color:var(--ink-faint); margin-top:18px; line-height:1.6; }
+  footer{ border-top:1px solid var(--line); padding:36px 24px; text-align:center; color:var(--ink-dim); font-size:13px; max-width:1100px; margin:0 auto; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">Naksh<em>atra</em></div>
+  <div class="nav-links">
+    <a href="kundli.html">Kundli</a>
+    <a href="dasha.html">Dasha</a>
+    <a href="jaimini-kp.html">Jaimini &amp; KP</a>
+    <a href="predictions.html">Predictions</a>
+  </div>
+  <a href="signin.html" class="btn-outline">Sign in</a>
+</nav>
+
+<main>
+  <div class="page-head">
+    <h1>Shadbala</h1>
+    <p>Cecil Gupta &middot; the six-fold strength of each planet, measured against a 60% baseline.</p>
+  </div>
+
+  <div class="bar-panel" id="barPanel"></div>
+  <div class="baseline" style="max-width:900px; margin:8px auto 0;">Dashed marker at 60% represents the classical minimum strength (Shashtiamsha Bala) a planet needs to give its full promised results.</div>
+
+  <div class="verdict-grid" id="verdictGrid" style="margin-top:32px;"></div>
+
+  <p class="note">Shown here is a representative strength ranking based on dignity, house placement, and directional considerations. Full Shadbala requires six separate calculations (Sthana, Dig, Kala, Chesta, Naisargika, and Drik Bala) from a live ephemeris.</p>
+</main>
+
+<footer>
+  Nakshatra — built on classical Vedic and Jaimini calculation methods.
+</footer>
+
+<script>
+// Representative strength values (out of 100, 60 = classical minimum threshold)
+const data = [
+  {planet:"Sun", value:58, verdict:"weak", text:"Sun sits in its own strength range but close to the threshold — steady rather than commanding."},
+  {planet:"Moon", value:44, verdict:"weak", text:"Moon runs below baseline in this chart, suggesting emotional steadiness needs conscious cultivation."},
+  {planet:"Mars", value:71, verdict:"strong", text:"Mars is well-placed, lending drive and resilience under pressure."},
+  {planet:"Mercury", value:62, verdict:"strong", text:"Mercury clears the threshold, supporting clear analytical thinking."},
+  {planet:"Jupiter", value:76, verdict:"strong", text:"Jupiter is the chart's strongest planet — a reliable source of judgment and growth."},
+  {planet:"Venus", value:68, verdict:"strong", text:"Venus holds solid strength, favouring relationships and aesthetic sense."},
+  {planet:"Saturn", value:52, verdict:"weak", text:"Saturn falls below baseline, suggesting discipline is built through effort rather than ease."}
+];
+
+const panel = document.getElementById('barPanel');
+data.forEach(d=>{
+  const row = document.createElement('div');
+  row.className = 'bar-row';
+  row.innerHTML = `
+    <div class="bar-label">${d.planet}</div>
+    <div class="bar-track"><div class="bar-fill ${d.verdict==='weak'?'weak':''}" style="width:${d.value}%"></div></div>
+    <div class="bar-value">${d.value}%</div>
+  `;
+  panel.appendChild(row);
+});
+
+const grid = document.getElementById('verdictGrid');
+data.forEach(d=>{
+  const cell = document.createElement('div');
+  cell.className = 'verdict-cell';
+  cell.innerHTML = `<div class="verdict-planet ${d.verdict}">${d.planet}</div><div class="verdict-text">${d.text}</div>`;
+  grid.appendChild(cell);
+});
+</script>
+</body>
+</html>

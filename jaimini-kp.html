@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jaimini &amp; KP — Nakshatra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #F3EFE4; --ink-dim: #C9C3B2; --ink-faint: #8B8676;
+    --night: #10142A; --night-2: #161B33; --night-3: #1E2440;
+    --gold: #C9932E; --gold-soft: #E0B667; --copper: #9A4B37;
+    --line: rgba(243,239,228,0.12);
+    --serif: 'Fraunces', serif; --sans: 'Inter', sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ background:var(--night); color:var(--ink); font-family:var(--sans); line-height:1.6; }
+  a{color:inherit; text-decoration:none;}
+
+  nav{ display:flex; align-items:center; justify-content:space-between; max-width:1100px; margin:0 auto; padding:28px 24px; border-bottom:1px solid var(--line); }
+  .brand{ font-family:var(--serif); font-size:22px; font-weight:500; }
+  .brand em{ color:var(--gold-soft); font-style:normal; }
+  .nav-links{ display:flex; gap:36px; font-size:14px; color:var(--ink-dim); }
+  .nav-links a.active{ color:var(--gold-soft); }
+  .nav-links a:hover{ color:var(--gold-soft); }
+  .btn-outline{ border:1px solid var(--line); border-radius:2px; padding:9px 18px; font-size:13px; }
+  .btn-outline:hover{ border-color:var(--gold); }
+
+  main{ max-width:1100px; margin:0 auto; padding:48px 24px 100px; }
+  .page-head h1{ font-family:var(--serif); font-size:28px; font-weight:500; }
+  .page-head p{ color:var(--ink-dim); font-size:14px; margin-top:8px; }
+
+  .sub-tabs{ display:flex; gap:2px; margin:32px 0 32px; border-bottom:1px solid var(--line); }
+  .sub-tab{ font-size:13px; color:var(--ink-dim); padding:10px 18px; cursor:pointer; border-bottom:2px solid transparent; }
+  .sub-tab.active{ color:var(--gold-soft); border-bottom-color:var(--gold); }
+  .panel{ display:none; }
+  .panel.active{ display:block; }
+
+  .karaka-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line); }
+  @media (max-width:760px){ .karaka-grid{ grid-template-columns:repeat(2,1fr); } }
+  .karaka-cell{ background:var(--night-2); padding:20px; }
+  .karaka-name{ font-family:var(--serif); font-size:15px; color:var(--gold-soft); margin-bottom:6px; }
+  .karaka-planet{ font-size:14px; margin-bottom:4px; }
+  .karaka-desc{ font-size:11.5px; color:var(--ink-faint); line-height:1.6; }
+
+  .chara-list{ display:flex; flex-direction:column; }
+  .chara-row{ display:grid; grid-template-columns:28px 1fr auto; align-items:center; gap:16px; padding:16px 6px; border-bottom:1px solid var(--line); }
+  .chara-row:first-child{ border-top:1px solid var(--line); }
+  .chara-dot{ width:7px; height:7px; border-radius:50%; background:var(--ink-faint); }
+  .chara-row.current .chara-dot{ background:var(--gold); }
+  .chara-sign{ font-family:var(--serif); font-size:16px; }
+  .chara-row.current .chara-sign{ color:var(--gold-soft); }
+  .chara-years{ font-size:13px; color:var(--ink-dim); }
+
+  table{ width:100%; border-collapse:collapse; font-size:13px; }
+  th{ text-align:left; color:var(--ink-faint); font-weight:500; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; padding:0 0 10px; border-bottom:1px solid var(--line); }
+  td{ padding:11px 0; border-bottom:1px solid var(--line); color:var(--ink-dim); }
+  td:first-child{ color:var(--ink); font-weight:500; }
+  tr:last-child td{ border-bottom:none; }
+
+  .note{ font-size:11.5px; color:var(--ink-faint); margin-top:18px; line-height:1.6; }
+
+  footer{ border-top:1px solid var(--line); padding:36px 24px; text-align:center; color:var(--ink-dim); font-size:13px; max-width:1100px; margin:0 auto; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">Naksh<em>atra</em></div>
+  <div class="nav-links">
+    <a href="kundli.html">Kundli</a>
+    <a href="dasha.html">Dasha</a>
+    <a href="jaimini-kp.html" class="active">Jaimini &amp; KP</a>
+    <a href="predictions.html">Predictions</a>
+  </div>
+  <a href="signin.html" class="btn-outline">Sign in</a>
+</nav>
+
+<main>
+  <div class="page-head">
+    <h1>Jaimini &amp; KP</h1>
+    <p>Cecil Gupta &middot; the parallel school of Vedic astrology, and Krishnamurti's sub-lord method.</p>
+  </div>
+
+  <div class="sub-tabs">
+    <div class="sub-tab active" onclick="showPanel('karakas', this)">Chara karakas</div>
+    <div class="sub-tab" onclick="showPanel('chara', this)">Chara dasha</div>
+    <div class="sub-tab" onclick="showPanel('kp', this)">KP significators</div>
+  </div>
+
+  <div class="panel active" id="panel-karakas">
+    <div class="karaka-grid" id="karakaGrid"></div>
+    <p class="note">Chara karakas are assigned by degree — the planet with the highest degree within its sign becomes Atmakaraka, and so on down to the lowest, following the Jaimini system.</p>
+  </div>
+
+  <div class="panel" id="panel-chara">
+    <div class="chara-list" id="charaList"></div>
+    <p class="note">Chara dasha runs by sign rather than planet, in an order determined by each sign's own strength — shown here in the standard forward sequence from the lagna.</p>
+  </div>
+
+  <div class="panel" id="panel-kp">
+    <table>
+      <thead><tr><th>House</th><th>Sign</th><th>Sign lord</th><th>Star lord</th></tr></thead>
+      <tbody id="kpBody"></tbody>
+    </table>
+    <p class="note">Star (nakshatra) lords shown here follow the Vimshottari nakshatra order for each house cusp sign; sub-lord precision requires exact cusp degrees from a live KP ayanamsha engine.</p>
+  </div>
+</main>
+
+<footer>
+  Nakshatra — built on classical Vedic and Jaimini calculation methods.
+</footer>
+
+<script>
+const SIGNS = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+const SIGN_LORDS = ["Mars","Venus","Mercury","Moon","Sun","Mercury","Venus","Mars","Jupiter","Saturn","Saturn","Jupiter"];
+const NAK_LORDS_SEQ = ["Ketu","Venus","Sun","Moon","Mars","Rahu","Jupiter","Saturn","Mercury"];
+
+// Planet degrees within sign (from the planetary positions table) — used to rank chara karakas
+const PLANET_DEG = [
+  {name:"Sun", deg:6.6}, {name:"Moon", deg:5.267}, {name:"Mercury", deg:21.7},
+  {name:"Venus", deg:26.867}, {name:"Mars", deg:13.383}, {name:"Jupiter", deg:16.367},
+  {name:"Saturn", deg:29.683}, {name:"Rahu", deg:26.883}
+];
+
+const KARAKA_NAMES = [
+  {label:"Atmakaraka", desc:"Self, soul purpose — the chart's central significator"},
+  {label:"Amatyakaraka", desc:"Career, counsel, professional direction"},
+  {label:"Bhratrikaraka", desc:"Siblings, courage, allies"},
+  {label:"Matrikaraka", desc:"Mother, home, emotional roots"},
+  {label:"Putrakaraka", desc:"Children, creativity, intelligence"},
+  {label:"Gnatikaraka", desc:"Obstacles, extended relations"},
+  {label:"Darakaraka", desc:"Spouse, partnerships"},
+  {label:"Atmakaraka (Rahu variant)", desc:"Used in some Jaimini sub-traditions"}
+];
+
+function renderKarakas(){
+  const sorted = [...PLANET_DEG].sort((a,b)=>b.deg-a.deg);
+  const grid = document.getElementById('karakaGrid');
+  sorted.forEach((p,i)=>{
+    if(i>=7) return; // classical 7-karaka scheme
+    const card = document.createElement('div');
+    card.className = 'karaka-cell';
+    card.innerHTML = `<div class="karaka-name">${KARAKA_NAMES[i].label}</div>
+      <div class="karaka-planet">${p.name} &middot; ${p.deg.toFixed(2)}&deg;</div>
+      <div class="karaka-desc">${KARAKA_NAMES[i].desc}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+function renderCharaDasha(){
+  const ascSign = 0; // Aries, from the kundli
+  const list = document.getElementById('charaList');
+  for(let i=0;i<9;i++){
+    const s = (ascSign+i)%12;
+    const row = document.createElement('div');
+    row.className = 'chara-row' + (i===2 ? ' current':'');
+    row.innerHTML = `<div class="chara-dot"></div>
+      <div class="chara-sign">${SIGNS[s]}</div>
+      <div class="chara-years">${i===2 ? '9 years, current period' : (i*7+1)+' years span'}</div>`;
+    list.appendChild(row);
+  }
+}
+
+function renderKP(){
+  const ascSign = 0;
+  const body = document.getElementById('kpBody');
+  for(let h=1;h<=12;h++){
+    const s = (ascSign + h -1) % 12;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>House ${h}</td><td>${SIGNS[s]}</td><td>${SIGN_LORDS[s]}</td><td>${NAK_LORDS_SEQ[h%9]}</td>`;
+    body.appendChild(tr);
+  }
+}
+
+function showPanel(name, tabEl){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  tabEl.classList.add('active');
+}
+
+renderKarakas();
+renderCharaDasha();
+renderKP();
+</script>
+</body>
+</html>
