@@ -63,6 +63,23 @@
   .antar-item.current-antar .p{ color:var(--gold-soft); }
 
   footer{ border-top:1px solid var(--line); padding:36px 24px; text-align:center; color:var(--ink-dim); font-size:13px; max-width:1100px; margin:0 auto; }
+
+  .birth-form{ background:var(--night-2); border:1px solid var(--line); border-radius:4px; padding:28px 32px; margin:32px 0 40px; }
+  .birth-form h2{ font-family:var(--serif); font-size:19px; font-weight:500; margin-bottom:4px; }
+  .birth-form .sub{ font-size:12.5px; color:var(--ink-faint); margin-bottom:20px; }
+  .bf-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; align-items:end; }
+  @media (max-width:900px){ .bf-grid{ grid-template-columns:repeat(2,1fr); } }
+  .bf-field label{ display:block; font-size:11px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px; }
+  .bf-field input, .bf-field select{ width:100%; background:var(--night); border:1px solid var(--line); border-radius:2px; color:var(--ink); font-family:var(--sans); font-size:13.5px; padding:9px 10px; }
+  .bf-field input:focus, .bf-field select:focus{ outline:none; border-color:var(--gold); }
+  .bf-manual{ display:none; grid-column:1/-1; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:2px; }
+  .bf-manual.show{ display:grid; }
+  .bf-submit{ grid-column:1/-1; display:flex; align-items:center; gap:14px; margin-top:4px; }
+  .btn-gold{ background:var(--gold); color:var(--night); border:none; border-radius:2px; padding:11px 22px; font-size:13.5px; font-weight:500; font-family:var(--sans); cursor:pointer; }
+  .btn-gold:hover{ background:var(--gold-soft); }
+  .bf-status{ font-size:12px; color:var(--ink-faint); }
+  .bf-status.err{ color:var(--copper); }
+  .note{ font-size:11.5px; color:var(--ink-faint); margin-top:14px; line-height:1.6; }
 </style>
 </head>
 <body>
@@ -81,90 +98,279 @@
 <main>
   <div class="page-head">
     <h1>Vimshottari dasha</h1>
-    <p>Cecil Gupta &middot; the full 120-year cycle, mahadasha and antardasha.</p>
+    <p id="pageSub">Cecil Gupta &middot; the full 120-year cycle, mahadasha and antardasha.</p>
+  </div>
+
+  <div class="birth-form" id="birthForm">
+    <h2>Generate your dasha</h2>
+    <div class="sub">Enter your birth details for your real Vimshottari timeline — calculated from your Moon's exact nakshatra position.</div>
+    <div class="bf-grid">
+      <div class="bf-field">
+        <label>Full name</label>
+        <input type="text" id="bfName" placeholder="Your name" value="Cecil Gupta">
+      </div>
+      <div class="bf-field">
+        <label>Date of birth</label>
+        <input type="date" id="bfDate" value="1980-07-23">
+      </div>
+      <div class="bf-field">
+        <label>Time of birth</label>
+        <input type="time" id="bfTime" value="00:50">
+      </div>
+      <div class="bf-field">
+        <label>Birthplace</label>
+        <select id="bfCity" onchange="onCityChange()"></select>
+      </div>
+      <div class="bf-manual" id="bfManual">
+        <div class="bf-field"><label>Latitude</label><input type="number" step="0.0001" id="bfLat" placeholder="e.g. 28.6139"></div>
+        <div class="bf-field"><label>Longitude</label><input type="number" step="0.0001" id="bfLon" placeholder="e.g. 77.2090"></div>
+        <div class="bf-field"><label>Timezone offset (hrs)</label><input type="number" step="0.25" id="bfTz" placeholder="e.g. 5.5" value="5.5"></div>
+      </div>
+      <div class="bf-submit">
+        <button class="btn-gold" onclick="generateFromForm()">Generate dasha</button>
+        <span class="bf-status" id="bfStatus">Showing a sample timeline below. Fill in your own details and generate to see yours.</span>
+      </div>
+      <div class="bf-field" style="grid-column:1/-1;">
+        <div class="note" style="margin-top:0;">Calculated from your Moon's sidereal position (Lahiri ayanamsha) using the classical 120-year Vimshottari cycle.</div>
+      </div>
+    </div>
   </div>
 
   <div class="now-band">
     <div>
       <div class="now-label">Running now</div>
-      <div class="now-value">Mercury mahadasha, Rahu antardasha</div>
-      <div class="now-sub">Since June 2024 &middot; runs until March 2027</div>
+      <div class="now-value" id="nowValue">Mercury mahadasha, Rahu antardasha</div>
+      <div class="now-sub" id="nowSub">Since June 2024 &middot; runs until March 2027</div>
     </div>
-    <a href="#" class="btn-outline">View pratyantar</a>
   </div>
 
-  <div class="maha-list" id="mahaList">
-
-    <div class="maha-row" onclick="toggle(this)">
-      <div class="maha-dot"></div>
-      <div class="maha-planet">Saturn</div>
-      <div class="maha-years">28 Jun 1963 &ndash; 28 Jun 1996</div>
-      <div class="maha-chevron">&#8250;</div>
-    </div>
-    <div class="antar-panel">
-      <div class="antar-item"><span class="p">Saturn &ndash; Saturn</span><span class="y">1963 &ndash; 1966</span></div>
-      <div class="antar-item"><span class="p">Saturn &ndash; Mercury</span><span class="y">1966 &ndash; 1969</span></div>
-      <div class="antar-item"><span class="p">Saturn &ndash; Ketu</span><span class="y">1969 &ndash; 1971</span></div>
-    </div>
-
-    <div class="maha-row current open" onclick="toggle(this)">
-      <div class="maha-dot"></div>
-      <div class="maha-planet">Mercury</div>
-      <div class="maha-years">28 Jun 1996 &ndash; 28 Jun 2013</div>
-      <div class="maha-chevron">&#8250;</div>
-    </div>
-    <div class="antar-panel open">
-      <div class="antar-item"><span class="p">Mercury &ndash; Mercury</span><span class="y">1996 &ndash; 1999</span></div>
-      <div class="antar-item"><span class="p">Mercury &ndash; Ketu</span><span class="y">1999 &ndash; 2000</span></div>
-      <div class="antar-item current-antar"><span class="p">Mercury &ndash; Rahu</span><span class="y">2024 &ndash; 2027, current</span></div>
-      <div class="antar-item"><span class="p">Mercury &ndash; Jupiter</span><span class="y">2027 &ndash; 2029</span></div>
-    </div>
-
-    <div class="maha-row" onclick="toggle(this)">
-      <div class="maha-dot"></div>
-      <div class="maha-planet">Ketu</div>
-      <div class="maha-years">28 Jun 2013 &ndash; 28 Jun 2020</div>
-      <div class="maha-chevron">&#8250;</div>
-    </div>
-    <div class="antar-panel"></div>
-
-    <div class="maha-row" onclick="toggle(this)">
-      <div class="maha-dot"></div>
-      <div class="maha-planet">Venus</div>
-      <div class="maha-years">28 Jun 2020 &ndash; 28 Jun 2040</div>
-      <div class="maha-chevron">&#8250;</div>
-    </div>
-    <div class="antar-panel"></div>
-
-    <div class="maha-row" onclick="toggle(this)">
-      <div class="maha-dot"></div>
-      <div class="maha-planet">Sun</div>
-      <div class="maha-years">28 Jun 2040 &ndash; 28 Jun 2046</div>
-      <div class="maha-chevron">&#8250;</div>
-    </div>
-    <div class="antar-panel"></div>
-
-    <div class="maha-row" onclick="toggle(this)">
-      <div class="maha-dot"></div>
-      <div class="maha-planet">Moon</div>
-      <div class="maha-years">28 Jun 2046 &ndash; 28 Jun 2056</div>
-      <div class="maha-chevron">&#8250;</div>
-    </div>
-    <div class="antar-panel"></div>
-
-  </div>
+  <div class="maha-list" id="mahaList"></div>
 </main>
 
 <footer>
   Nakshatra — built on classical Vedic and Jaimini calculation methods.
 </footer>
 
+<script src="astro-engine.js"></script>
 <script>
+const DASHA_ORDER = ['Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury'];
+const DASHA_YEARS = {Ketu:7,Venus:20,Sun:6,Moon:10,Mars:7,Rahu:18,Jupiter:16,Saturn:19,Mercury:17};
+const YEAR_DAYS = 365.25;
+
+function addYears(date, years){
+  return new Date(date.getTime() + years * YEAR_DAYS * 86400000);
+}
+function fmtDate(d){
+  return d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+}
+
+function computeMahadashas(moonSidLon, birthDate){
+  const span = 360/27;
+  const nakIndex = Math.floor(AstroEngine.mod360(moonSidLon) / span);
+  const posInNak = AstroEngine.mod360(moonSidLon) - nakIndex*span;
+  const fracElapsed = posInNak/span;
+  const startLordIdx = nakIndex % 9;
+
+  let mahas = [];
+  let cursor = new Date(birthDate);
+  for(let i=0;i<9;i++){
+    const lordIdx = (startLordIdx+i)%9;
+    const lord = DASHA_ORDER[lordIdx];
+    const fullYears = DASHA_YEARS[lord];
+    const isFirst = i===0;
+    const durYears = isFirst ? fullYears*(1-fracElapsed) : fullYears;
+    const start = new Date(cursor);
+    const end = addYears(start, durYears);
+    mahas.push({ lord, fullYears, start, end, isFirst, fracElapsedAtStart: isFirst?fracElapsed:0 });
+    cursor = end;
+  }
+  return mahas;
+}
+
+function computeAntardashas(maha){
+  const lordIdx = DASHA_ORDER.indexOf(maha.lord);
+  const fullYears = maha.fullYears;
+  let antars = [];
+  if(maha.isFirst){
+    const T0 = addYears(maha.start, -maha.fracElapsedAtStart*fullYears);
+    let cursor = new Date(T0);
+    for(let j=0;j<9;j++){
+      const subLord = DASHA_ORDER[(lordIdx+j)%9];
+      const subDur = fullYears * DASHA_YEARS[subLord] / 120;
+      const subStart = new Date(cursor);
+      const subEnd = addYears(subStart, subDur);
+      cursor = subEnd;
+      if(subEnd <= maha.start) continue;
+      antars.push({ lord: subLord, start: subStart < maha.start ? maha.start : subStart, end: subEnd });
+    }
+  } else {
+    let cursor = new Date(maha.start);
+    for(let j=0;j<9;j++){
+      const subLord = DASHA_ORDER[(lordIdx+j)%9];
+      const subDur = fullYears * DASHA_YEARS[subLord] / 120;
+      const subStart = new Date(cursor);
+      const subEnd = addYears(subStart, subDur);
+      cursor = subEnd;
+      antars.push({ lord: subLord, start: subStart, end: subEnd });
+    }
+  }
+  return antars;
+}
+
 function toggle(row){
   row.classList.toggle('open');
   const panel = row.nextElementSibling;
   panel.classList.toggle('open');
 }
+
+function renderDasha(moonSidLon, birthDate, name){
+  const mahas = computeMahadashas(moonSidLon, birthDate);
+  const now = new Date();
+  const list = document.getElementById('mahaList');
+  list.innerHTML = '';
+
+  let currentMaha = null, currentAntar = null;
+
+  mahas.forEach(maha => {
+    const isCurrent = now >= maha.start && now < maha.end;
+    if(isCurrent) currentMaha = maha;
+    const antars = computeAntardashas(maha);
+
+    const row = document.createElement('div');
+    row.className = 'maha-row' + (isCurrent ? ' current open' : '');
+    row.onclick = () => toggle(row);
+    row.innerHTML = `<div class="maha-dot"></div><div class="maha-planet">${maha.lord}</div><div class="maha-years">${fmtDate(maha.start)} &ndash; ${fmtDate(maha.end)}</div><div class="maha-chevron">&#8250;</div>`;
+    list.appendChild(row);
+
+    const panel = document.createElement('div');
+    panel.className = 'antar-panel' + (isCurrent ? ' open' : '');
+    antars.forEach(a => {
+      const isCurAntar = isCurrent && now >= a.start && now < a.end;
+      if(isCurAntar) currentAntar = a;
+      const item = document.createElement('div');
+      item.className = 'antar-item' + (isCurAntar ? ' current-antar' : '');
+      item.innerHTML = `<span class="p">${maha.lord} &ndash; ${a.lord}</span><span class="y">${fmtDate(a.start)} &ndash; ${fmtDate(a.end)}${isCurAntar ? ', current' : ''}</span>`;
+      panel.appendChild(item);
+    });
+    list.appendChild(panel);
+  });
+
+  if(currentMaha && currentAntar){
+    document.getElementById('nowValue').textContent = `${currentMaha.lord} mahadasha, ${currentAntar.lord} antardasha`;
+    document.getElementById('nowSub').innerHTML = `Since ${fmtDate(currentAntar.start)} &middot; runs until ${fmtDate(currentAntar.end)}`;
+  } else if(now < mahas[0].start){
+    document.getElementById('nowValue').textContent = `${mahas[0].lord} mahadasha begins ${fmtDate(mahas[0].start)}`;
+    document.getElementById('nowSub').textContent = 'This birth date is in the future.';
+  } else {
+    document.getElementById('nowValue').textContent = `Beyond ${mahas[mahas.length-1].lord} mahadasha`;
+    document.getElementById('nowSub').textContent = 'Outside the calculated 120-year window from birth.';
+  }
+
+  document.getElementById('pageSub').textContent = `${name} \u00b7 the full 120-year cycle, mahadasha and antardasha.`;
+}
+
+// --- Birth details form (shared pattern with kundli.html) ---------------
+const CITIES = [
+  ["Agra, Uttar Pradesh", 27.1767, 78.0081],["Delhi", 28.6139, 77.2090],
+  ["Mumbai, Maharashtra", 19.0760, 72.8777],["Kolkata, West Bengal", 22.5726, 88.3639],
+  ["Chennai, Tamil Nadu", 13.0827, 80.2707],["Bengaluru, Karnataka", 12.9716, 77.5946],
+  ["Hyderabad, Telangana", 17.3850, 78.4867],["Koratla, Telangana", 18.8206, 78.7156],
+  ["Vizianagaram, Andhra Pradesh", 18.1067, 83.3956],["Ahmedabad, Gujarat", 23.0225, 72.5714],
+  ["Pune, Maharashtra", 18.5204, 73.8567],["Jaipur, Rajasthan", 26.9124, 75.7873],
+  ["Lucknow, Uttar Pradesh", 26.8467, 80.9462],["Nagpur, Maharashtra", 21.1458, 79.0882],
+  ["Bhopal, Madhya Pradesh", 23.2599, 77.4126],["Patna, Bihar", 25.5941, 85.1376],
+  ["Surat, Gujarat", 21.1702, 72.8311],["Kanpur, Uttar Pradesh", 26.4499, 80.3319],
+  ["Indore, Madhya Pradesh", 22.7196, 75.8577],["Varanasi, Uttar Pradesh", 25.3176, 82.9739],
+  ["Amritsar, Punjab", 31.6340, 74.8723],["Guwahati, Assam", 26.1445, 91.7362]
+];
+
+function initCitySelect(){
+  const sel = document.getElementById('bfCity');
+  CITIES.forEach((c,i)=>{
+    const o = document.createElement('option');
+    o.value = i; o.textContent = c[0] + ' (India, +5:30)';
+    sel.appendChild(o);
+  });
+  const other = document.createElement('option');
+  other.value = 'other'; other.textContent = 'Other — enter coordinates manually';
+  sel.appendChild(other);
+}
+
+function onCityChange(){
+  const val = document.getElementById('bfCity').value;
+  document.getElementById('bfManual').classList.toggle('show', val === 'other');
+}
+
+function generateFromForm(){
+  const statusEl = document.getElementById('bfStatus');
+  try{
+    const name = document.getElementById('bfName').value.trim() || 'Your dasha';
+    const dateVal = document.getElementById('bfDate').value;
+    const timeVal = document.getElementById('bfTime').value;
+    if(!dateVal || !timeVal){ throw new Error('Please fill in the date and time of birth.'); }
+    const [y,m,d] = dateVal.split('-').map(Number);
+    const [hh,mm] = timeVal.split(':').map(Number);
+
+    const cityVal = document.getElementById('bfCity').value;
+    let lat, lon, tz;
+    if(cityVal === 'other'){
+      lat = parseFloat(document.getElementById('bfLat').value);
+      lon = parseFloat(document.getElementById('bfLon').value);
+      tz = parseFloat(document.getElementById('bfTz').value);
+      if(isNaN(lat) || isNaN(lon) || isNaN(tz)) throw new Error('Please enter latitude, longitude and timezone offset.');
+    } else {
+      const c = CITIES[parseInt(cityVal)];
+      lat = c[1]; lon = c[2]; tz = 5.5;
+    }
+
+    const result = AstroEngine.computeChart({ year:y, month:m, day:d, hour:hh, minute:mm, tzOffset:tz, lat, lon });
+    const birthDate = new Date(Date.UTC(y, m-1, d, hh - tz, mm));
+
+    renderDasha(result.bodies.Moon.lon, birthDate, name);
+
+    statusEl.textContent = `Dasha generated for ${name}.`;
+    statusEl.classList.remove('err');
+  } catch(e){
+    statusEl.textContent = e.message || 'Something went wrong — please check the details and try again.';
+    statusEl.classList.add('err');
+  }
+}
+
+initCitySelect();
+
+let queryPlaceOverride = null;
+function applyQueryParams(){
+  const qs = new URLSearchParams(window.location.search);
+  if([...qs.keys()].length === 0) return;
+  if(qs.get('name')) document.getElementById('bfName').value = qs.get('name');
+  if(qs.get('date')) document.getElementById('bfDate').value = qs.get('date');
+  if(qs.get('time')) document.getElementById('bfTime').value = qs.get('time');
+  const lat = qs.get('lat'), lon = qs.get('lon'), tz = qs.get('tz'), place = qs.get('place');
+
+  if(lat && lon){
+    const latF = parseFloat(lat), lonF = parseFloat(lon);
+    const matchIdx = CITIES.findIndex(c => Math.abs(c[1]-latF) < 0.05 && Math.abs(c[2]-lonF) < 0.05);
+    if(matchIdx >= 0){
+      document.getElementById('bfCity').value = matchIdx;
+      onCityChange();
+    } else {
+      document.getElementById('bfCity').value = 'other';
+      onCityChange();
+      document.getElementById('bfLat').value = lat;
+      document.getElementById('bfLon').value = lon;
+      document.getElementById('bfTz').value = tz || '5.5';
+    }
+    generateFromForm();
+  } else if(place){
+    document.getElementById('bfCity').value = 'other';
+    onCityChange();
+    document.getElementById('bfStatus').textContent = `We couldn't recognise "${place}" automatically — please enter its latitude, longitude and timezone offset, then generate.`;
+  }
+}
+
+// initial demo render (Cecil Gupta, matches kundli.html's sample chart)
+renderDasha(7*30 + 5+16/60, new Date(Date.UTC(1980,6,23, 0-5.5, 50)), 'Cecil Gupta');
+applyQueryParams();
 </script>
 
 </body>

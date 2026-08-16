@@ -147,6 +147,7 @@
       <div class="meta" id="chartMeta">23 July 1980, 00:50 AM &middot; Agra, Uttar Pradesh, India &middot; Lahiri ayanamsha</div>
     </div>
     <a href="#" class="btn-outline">Download full reading</a>
+    <a href="dasha.html" id="viewDashaLink" class="btn-outline" style="margin-left:10px;">View Vimshottari dasha</a>
   </div>
 
   <div class="tabs" id="tabRow"></div>
@@ -254,6 +255,7 @@ const CITIES = [
   ["Bengaluru, Karnataka", 12.9716, 77.5946],
   ["Hyderabad, Telangana", 17.3850, 78.4867],
   ["Koratla, Telangana", 18.8206, 78.7156],
+  ["Vizianagaram, Andhra Pradesh", 18.1067, 83.3956],
   ["Ahmedabad, Gujarat", 23.0225, 72.5714],
   ["Pune, Maharashtra", 18.5204, 73.8567],
   ["Jaipur, Rajasthan", 26.9124, 75.7873],
@@ -344,6 +346,15 @@ function generateFromForm(){
 
     statusEl.textContent = `Chart generated for ${name}.`;
     statusEl.classList.remove('err');
+
+    const dashaParams = new URLSearchParams();
+    dashaParams.set('name', name);
+    dashaParams.set('date', dateVal);
+    dashaParams.set('time', timeVal);
+    dashaParams.set('lat', lat);
+    dashaParams.set('lon', lon);
+    dashaParams.set('tz', tz);
+    document.getElementById('viewDashaLink').href = 'dasha.html?' + dashaParams.toString();
 
     currentVarga = 0;
     document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active', i===0));
