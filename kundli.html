@@ -303,7 +303,7 @@ function generateFromForm(){
       lon = parseFloat(document.getElementById('bfLon').value);
       tz = parseFloat(document.getElementById('bfTz').value);
       if(isNaN(lat) || isNaN(lon) || isNaN(tz)) throw new Error('Please enter latitude, longitude and timezone offset.');
-      placeLabel = `Lat ${lat.toFixed(2)}, Lon ${lon.toFixed(2)}`;
+      placeLabel = queryPlaceOverride || `Lat ${lat.toFixed(2)}, Lon ${lon.toFixed(2)}`;
     } else {
       const c = CITIES[parseInt(cityVal)];
       lat = c[1]; lon = c[2]; tz = 5.5;
@@ -355,6 +355,31 @@ function generateFromForm(){
 }
 
 initCitySelect();
+
+// --- Pick up birth details passed from the homepage form (?name=&date=&time=&place=&lat=&lon=&tz=) ---
+let queryPlaceOverride = null;
+function applyQueryParams(){
+  const qs = new URLSearchParams(window.location.search);
+  if([...qs.keys()].length === 0) return;
+  if(qs.get('name')) document.getElementById('bfName').value = qs.get('name');
+  if(qs.get('date')) document.getElementById('bfDate').value = qs.get('date');
+  if(qs.get('time')) document.getElementById('bfTime').value = qs.get('time');
+  const lat = qs.get('lat'), lon = qs.get('lon'), tz = qs.get('tz'), place = qs.get('place');
+
+  if(lat && lon){
+    document.getElementById('bfCity').value = 'other';
+    onCityChange();
+    document.getElementById('bfLat').value = lat;
+    document.getElementById('bfLon').value = lon;
+    document.getElementById('bfTz').value = tz || '5.5';
+    queryPlaceOverride = place || null;
+    generateFromForm();
+  } else if(place){
+    document.getElementById('bfCity').value = 'other';
+    onCityChange();
+    document.getElementById('bfStatus').textContent = `We couldn't recognise "${place}" automatically — please enter its latitude, longitude and timezone offset, then generate.`;
+  }
+}
 
 const ODD = [0,2,4,6,8,10];
 const MOVABLE=[0,3,6,9], FIXED=[1,4,7,10], DUAL=[2,5,8,11];
@@ -506,6 +531,7 @@ VARGAS.forEach((v,i)=>{
 });
 
 render();
+applyQueryParams();
 </script>
 </body>
 </html>
