@@ -367,11 +367,19 @@ function applyQueryParams(){
   const lat = qs.get('lat'), lon = qs.get('lon'), tz = qs.get('tz'), place = qs.get('place');
 
   if(lat && lon){
-    document.getElementById('bfCity').value = 'other';
-    onCityChange();
-    document.getElementById('bfLat').value = lat;
-    document.getElementById('bfLon').value = lon;
-    document.getElementById('bfTz').value = tz || '5.5';
+    // if the coordinates match a city already in our dropdown, select it there instead of falling back to "Other"
+    const latF = parseFloat(lat), lonF = parseFloat(lon);
+    const matchIdx = CITIES.findIndex(c => Math.abs(c[1]-latF) < 0.05 && Math.abs(c[2]-lonF) < 0.05);
+    if(matchIdx >= 0){
+      document.getElementById('bfCity').value = matchIdx;
+      onCityChange();
+    } else {
+      document.getElementById('bfCity').value = 'other';
+      onCityChange();
+      document.getElementById('bfLat').value = lat;
+      document.getElementById('bfLon').value = lon;
+      document.getElementById('bfTz').value = tz || '5.5';
+    }
     queryPlaceOverride = place || null;
     generateFromForm();
   } else if(place){
