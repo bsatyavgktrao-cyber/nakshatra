@@ -10,7 +10,7 @@
   :root{
     --ink: #F3EFE4; --ink-dim: #C9C3B2; --ink-faint: #8B8676;
     --night: #10142A; --night-2: #161B33;
-    --gold: #C9932E; --gold-soft: #E0B667;
+    --gold: #C9932E; --gold-soft: #E0B667; --copper:#9A4B37;
     --line: rgba(243,239,228,0.12);
     --serif: 'Fraunces', serif; --sans: 'Inter', sans-serif;
   }
@@ -31,8 +31,25 @@
   .page-head h1{ font-family:var(--serif); font-size:28px; font-weight:500; }
   .page-head p{ color:var(--ink-dim); font-size:14px; margin-top:8px; }
 
-  .cat-row{ display:flex; gap:8px; margin:32px 0 36px; flex-wrap:wrap; }
-  .cat{ font-size:12.5px; color:var(--ink-dim); padding:8px 16px; border:1px solid var(--line); border-radius:20px; cursor:pointer; }
+  .birth-form{ background:var(--night-2); border:1px solid var(--line); border-radius:4px; padding:28px 32px; margin:32px 0 40px; }
+  .birth-form h2{ font-family:var(--serif); font-size:19px; font-weight:500; margin-bottom:4px; }
+  .birth-form .sub{ font-size:12.5px; color:var(--ink-faint); margin-bottom:20px; }
+  .bf-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; align-items:end; }
+  @media (max-width:900px){ .bf-grid{ grid-template-columns:repeat(2,1fr); } }
+  .bf-field label{ display:block; font-size:11px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px; }
+  .bf-field input, .bf-field select{ width:100%; background:var(--night); border:1px solid var(--line); border-radius:2px; color:var(--ink); font-family:var(--sans); font-size:13.5px; padding:9px 10px; }
+  .bf-field input:focus, .bf-field select:focus{ outline:none; border-color:var(--gold); }
+  .bf-manual{ display:none; grid-column:1/-1; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:2px; }
+  .bf-manual.show{ display:grid; }
+  .bf-submit{ grid-column:1/-1; display:flex; align-items:center; gap:14px; margin-top:4px; }
+  .btn-gold{ background:var(--gold); color:var(--night); border:none; border-radius:2px; padding:11px 22px; font-size:13.5px; font-weight:500; font-family:var(--sans); cursor:pointer; }
+  .btn-gold:hover{ background:var(--gold-soft); }
+  .bf-status{ font-size:12px; color:var(--ink-faint); }
+  .bf-status.err{ color:var(--copper); }
+  .note{ font-size:11.5px; color:var(--ink-faint); margin-top:14px; line-height:1.6; }
+
+  .cat-row{ display:flex; gap:8px; margin:0 0 28px; flex-wrap:wrap; }
+  .cat{ font-size:12.5px; color:var(--ink-dim); padding:8px 16px; border:1px solid var(--line); border-radius:20px; cursor:pointer; background:none; font-family:var(--sans); }
   .cat.active{ color:var(--night); background:var(--gold-soft); border-color:var(--gold-soft); font-weight:500; }
 
   .pred-grid{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line); }
@@ -67,53 +84,400 @@
 <main>
   <div class="page-head">
     <h1>Predictions</h1>
-    <p>Cecil Gupta &middot; drawn from lagna, nakshatra, and house lordships.</p>
+    <p id="pageSub">Cecil Gupta &middot; drawn from lagna, nakshatra, and house occupation.</p>
   </div>
 
-  <div class="cat-row">
-    <div class="cat active">General</div>
-    <div class="cat">Nakshatra</div>
-    <div class="cat">House-wise</div>
-    <div class="cat">Health</div>
-    <div class="cat">Career</div>
-    <div class="cat">Relationships</div>
+  <div class="birth-form" id="birthForm">
+    <h2>Generate your predictions</h2>
+    <div class="sub">Enter your birth details — readings are generated from your actual ascendant, Moon nakshatra, and planetary house placements.</div>
+    <div class="bf-grid">
+      <div class="bf-field">
+        <label>Full name</label>
+        <input type="text" id="bfName" placeholder="Your name" value="Cecil Gupta">
+      </div>
+      <div class="bf-field">
+        <label>Date of birth</label>
+        <input type="date" id="bfDate" value="1980-07-23">
+      </div>
+      <div class="bf-field">
+        <label>Time of birth</label>
+        <input type="time" id="bfTime" value="00:50">
+      </div>
+      <div class="bf-field">
+        <label>Birthplace</label>
+        <select id="bfCity" onchange="onCityChange()"></select>
+      </div>
+      <div class="bf-manual" id="bfManual">
+        <div class="bf-field" style="grid-column:1/-1; display:flex; gap:10px; align-items:end;">
+          <div style="flex:1;">
+            <label>Search any place in the world</label>
+            <input type="text" id="bfPlaceSearch" placeholder="e.g. New York, USA or London, UK">
+          </div>
+          <button type="button" onclick="lookupPlace()" class="btn-outline" style="padding:9px 16px; cursor:pointer;">Find coordinates</button>
+        </div>
+        <div class="bf-field"><label>Latitude</label><input type="number" step="0.0001" id="bfLat" placeholder="e.g. 28.6139"></div>
+        <div class="bf-field"><label>Longitude</label><input type="number" step="0.0001" id="bfLon" placeholder="e.g. 77.2090"></div>
+        <div class="bf-field"><label>Timezone offset (hrs)</label><input type="number" step="0.25" id="bfTz" placeholder="e.g. 5.5" value="5.5"></div>
+      </div>
+      <div class="bf-submit">
+        <button class="btn-gold" onclick="generateFromForm()">Generate predictions</button>
+        <span class="bf-status" id="bfStatus">Showing a sample reading below. Fill in your own details and generate to see yours.</span>
+      </div>
+      <div class="bf-field" style="grid-column:1/-1;">
+        <div class="note" style="margin-top:0;">Traditional Vedic delineations generated from your chart — a reflective guide, not a guarantee. For serious life decisions, treat this as one perspective among others.</div>
+      </div>
+    </div>
   </div>
 
-  <div class="pred-grid">
-    <div class="pred-card">
-      <div class="pred-head"><div class="pred-icon"></div><div class="pred-title">Character</div></div>
-      <div class="pred-body">Strong-willed and quietly intense, with a drive that holds steady under pressure. Loyalty runs deep once earned, and leadership tends to come through resolve rather than persuasion.</div>
-    </div>
-    <div class="pred-card">
-      <div class="pred-head"><div class="pred-icon"></div><div class="pred-title">Mind &amp; temperament</div></div>
-      <div class="pred-body">Sharp and probing, drawn to what lies beneath the surface. Views form firmly once settled, and there's a natural pull toward research or the lesser-explored.</div>
-    </div>
-    <div class="pred-card">
-      <div class="pred-head"><div class="pred-icon"></div><div class="pred-title">Career</div></div>
-      <div class="pred-body">Research, technical fields, or precision-driven work suit you well. Recognition tends to build gradually — a slow, compounding kind of success rather than a sudden rise.</div>
-    </div>
-    <div class="pred-card">
-      <div class="pred-head"><div class="pred-icon"></div><div class="pred-title">Relationships</div></div>
-      <div class="pred-body">Bonds form slowly but run deep once formed. A partner who respects your need for space will find you steady, protective, and quietly devoted in return.</div>
-    </div>
-    <div class="pred-card">
-      <div class="pred-head"><div class="pred-icon"></div><div class="pred-title">Health</div></div>
-      <div class="pred-body">The chart favours the heart and spine for attention over time. Regular movement and a disciplined pace matter more here than intensity.</div>
-    </div>
-    <div class="pred-card">
-      <div class="pred-head"><div class="pred-icon"></div><div class="pred-title">Wealth</div></div>
-      <div class="pred-body">Steady accumulation is favoured over windfalls. Property and long-term holdings serve better than speculative moves.</div>
-    </div>
-  </div>
+  <div class="cat-row" id="catRow"></div>
+  <div class="pred-grid" id="predGrid"></div>
 
   <div class="note-band">
-    These readings summarise classical Vedic principles applied to your chart. For a complete house-by-house and dasha-linked interpretation, view the full report.
+    These readings summarise classical Vedic principles applied to your chart's ascendant, Moon nakshatra, and whole-sign house placements. They're a traditional lens for reflection, not a deterministic forecast.
   </div>
 </main>
 
 <footer>
   Nakshatra — built on classical Vedic and Jaimini calculation methods.
 </footer>
+
+<script src="astro-engine.js"></script>
+<script>
+const SIGNS = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+const PLANETS = ["Sun","Moon","Mercury","Venus","Mars","Jupiter","Saturn","Rahu","Ketu"];
+
+const ASC_TRAITS = {
+  Aries:"Direct and quick to act, with a pioneering streak that prefers starting things over maintaining them. Impatience is the shadow side of real courage.",
+  Taurus:"Strong-willed and steady, building slowly but rarely letting go once committed. Comfort and reliability matter more than speed.",
+  Gemini:"Curious and quick-witted, happiest juggling ideas and conversations. Restlessness can undercut follow-through if not channelled.",
+  Cancer:"Sensitive and protective, with a strong pull toward home and close bonds. Moods run deep and colour how the world is perceived.",
+  Leo:"Warm and naturally commanding, drawn to recognition and creative self-expression. Pride is both the engine and the vulnerability here.",
+  Virgo:"Precise and service-minded, with an eye for what needs improving. Self-criticism can run higher than is fair to oneself.",
+  Libra:"Diplomatic and relationship-oriented, seeking balance and fairness in most situations. Indecision can creep in when weighing every side.",
+  Scorpio:"Strong-willed and quietly intense, with a drive that holds steady under pressure. Loyalty runs deep once earned.",
+  Sagittarius:"Optimistic and freedom-loving, drawn to philosophy, travel, and the bigger picture. Bluntness can outpace tact.",
+  Capricorn:"Disciplined and patient, willing to work long for lasting results. Can undervalue rest in pursuit of achievement.",
+  Aquarius:"Independent and idea-driven, more comfortable with the unconventional than the routine. Detachment can read as distance.",
+  Pisces:"Imaginative and empathetic, absorbing the moods of surroundings easily. Boundaries take conscious effort to hold."
+};
+
+const MOON_TRAITS = {
+  Aries:"Emotionally quick to react and quick to move on — feelings surface fast and rarely linger.",
+  Taurus:"Emotionally steady and comfort-seeking; security and familiar routines settle the mind.",
+  Gemini:"A restless, analytical inner life — processing feelings through talking and thinking rather than sitting with them.",
+  Cancer:"Deeply feeling and memory-driven, with emotional security tied closely to home and family.",
+  Leo:"Warm-hearted and expressive, needing some form of acknowledgment to feel emotionally settled.",
+  Virgo:"A practical, detail-oriented emotional style — feelings get sorted and analysed before they're voiced.",
+  Libra:"Emotional balance depends heavily on harmony in close relationships; conflict unsettles the mind quickly.",
+  Scorpio:"Sharp and probing, drawn to what lies beneath the surface. Feelings run intense and are rarely shown fully.",
+  Sagittarius:"An optimistic, freedom-seeking inner world — emotional weight is processed by keeping perspective wide.",
+  Capricorn:"A reserved, controlled emotional style; feelings are managed with discipline rather than displayed.",
+  Aquarius:"Emotionally detached and idea-oriented, more at ease with concepts than with raw sentiment.",
+  Pisces:"Highly impressionable and imaginative, with emotions that blend easily into empathy for others."
+};
+
+const NAK_TRAITS = {
+  "Ashwini":"Quick, pioneering energy with a natural instinct to heal and to act first. Impatience is the trade-off for genuine initiative.",
+  "Bharani":"Intense and disciplined, carrying real transformative willpower beneath a controlled exterior.",
+  "Krittika":"Sharp and purifying, with a cutting clarity that doesn't shy from hard truths or hard work.",
+  "Rohini":"Magnetic and grounded, with a strong aesthetic sense and steady material instincts.",
+  "Mrigashira":"Searching and curious, always chasing the next question rather than settling for the easy answer.",
+  "Ardra":"Stormy and transformative — growth here tends to come through intensity rather than ease.",
+  "Punarvasu":"Renewing and optimistic, able to return to steadiness after setbacks with real resilience.",
+  "Pushya":"Nurturing and dependable, often the one others lean on for stability and quiet guidance.",
+  "Ashlesha":"Perceptive and strategic, with a hypnotic, penetrating way of reading people and situations.",
+  "Magha":"Proud and legacy-minded, drawn to authority, ancestry, and being recognised for one's position.",
+  "Purva Phalguni":"Pleasure-loving and creative, with real warmth and a talent for enjoying life fully.",
+  "Uttara Phalguni":"Generous and dependable in partnership, with a quiet sense of duty toward others.",
+  "Hasta":"Skilful and resourceful, with clever hands and a knack for getting practical things done well.",
+  "Chitra":"Artistic and detail-oriented, with a strong instinct for design, form, and presentation.",
+  "Swati":"Independent and adaptable, valuing personal freedom and fair, balanced dealings.",
+  "Vishakha":"Goal-driven and determined, willing to pursue ambitions patiently over the long run.",
+  "Anuradha":"Devoted and disciplined, forming loyal, lasting bonds once trust is established.",
+  "Jyeshtha":"Protective and authoritative, often taking a senior or responsible role among peers.",
+  "Mula":"Investigative and root-seeking, drawn to get to the bottom of things, even if it means uprooting first.",
+  "Purva Ashadha":"Invincible-spirited and persuasive, with a strong will that rarely accepts defeat.",
+  "Uttara Ashadha":"Principled and steadily ambitious, building achievement through patient, ethical effort.",
+  "Shravana":"A natural listener and learner, gifted with strong retention and a gathering, connecting mind.",
+  "Dhanishta":"Rhythmic and driven, with a wealth-building, socially prominent, achievement-oriented streak.",
+  "Shatabhisha":"Independent and secretive, often drawn to healing, research, or the unconventional.",
+  "Purva Bhadrapada":"Intense and idealistic, carrying a fiery, transformative spiritual undercurrent.",
+  "Uttara Bhadrapada":"Calm and deep, with a steady wisdom that surfaces most under pressure.",
+  "Revati":"Compassionate and gentle, with a nurturing, transitional quality that helps others find their way."
+};
+
+const HOUSE_THEMES = [
+  {n:1, name:"Self &amp; vitality"}, {n:2, name:"Wealth &amp; speech"}, {n:3, name:"Courage &amp; effort"},
+  {n:4, name:"Home &amp; inner peace"}, {n:5, name:"Creativity &amp; intellect"}, {n:6, name:"Work &amp; obstacles"},
+  {n:7, name:"Partnerships"}, {n:8, name:"Transformation"}, {n:9, name:"Fortune &amp; belief"},
+  {n:10, name:"Career &amp; standing"}, {n:11, name:"Gains &amp; networks"}, {n:12, name:"Release &amp; retreat"}
+];
+
+const PLANET_QUALITY = {
+  Sun:"authority, visibility and self-confidence", Moon:"emotional focus and instinctive attention",
+  Mercury:"communication, analysis and practical detail", Venus:"harmony, pleasure and relationship warmth",
+  Mars:"drive, assertion and competitive energy", Jupiter:"growth, wisdom and expansion",
+  Saturn:"discipline, delay and long-term structure", Rahu:"ambition and an unconventional, amplifying pull",
+  Ketu:"detachment, introspection and quiet release"
+};
+
+const DASHA_THEME = {
+  Sun:"authority, recognition, and self-directed effort", Moon:"emotional matters, home, and instinctive decisions",
+  Mars:"drive, courage, and assertive action", Rahu:"ambition, rapid change, and unconventional opportunity",
+  Jupiter:"growth, learning, and expansion", Saturn:"discipline, patience, and structural, lasting effort",
+  Mercury:"communication, analysis, and practical dealings", Ketu:"introspection, release, and inward focus",
+  Venus:"relationships, comfort, and creative or financial matters"
+};
+
+function getHouse(planetSign, ascSign){
+  return ((planetSign - ascSign + 12) % 12) + 1;
+}
+
+let CHART = null; // { ascSign, houses:{1:[planets],...}, moonNak, moonSign, dashaLord }
+
+function computeChartData(name, birth){
+  const result = AstroEngine.computeChart(birth);
+  const ascSign = AstroEngine.signOf(result.bodies.Asc.lon);
+  const houses = {}; for(let i=1;i<=12;i++) houses[i] = [];
+  PLANETS.forEach(p=>{
+    const sign = AstroEngine.signOf(result.bodies[p].lon);
+    const h = getHouse(sign, ascSign);
+    houses[h].push(p);
+  });
+
+  // Vimshottari current mahadasha lord (mirrors dasha.html's algorithm)
+  const DASHA_ORDER = ['Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury'];
+  const DASHA_YEARS = {Ketu:7,Venus:20,Sun:6,Moon:10,Mars:7,Rahu:18,Jupiter:16,Saturn:19,Mercury:17};
+  const span = 360/27;
+  const moonAbs = AstroEngine.mod360(result.bodies.Moon.lon);
+  const nakIndex = Math.floor(moonAbs/span);
+  const posInNak = moonAbs - nakIndex*span;
+  const fracElapsed = posInNak/span;
+  const startIdx = nakIndex % 9;
+  let cursor = new Date(Date.UTC(birth.year, birth.month-1, birth.day, birth.hour - birth.tzOffset, birth.minute));
+  let dashaLord = DASHA_ORDER[startIdx];
+  for(let i=0;i<9;i++){
+    const lord = DASHA_ORDER[(startIdx+i)%9];
+    const full = DASHA_YEARS[lord];
+    const dur = i===0 ? full*(1-fracElapsed) : full;
+    const end = new Date(cursor.getTime() + dur*365.25*86400000);
+    if(new Date() >= cursor && new Date() < end){ dashaLord = lord; break; }
+    cursor = end;
+  }
+
+  return {
+    name, ascSign, houses,
+    moonSign: AstroEngine.signOf(result.bodies.Moon.lon),
+    moonNak: result.moonNakshatra,
+    dashaLord
+  };
+}
+
+function houseCard(h){
+  const theme = HOUSE_THEMES[h-1];
+  const occupants = CHART.houses[h];
+  let body;
+  if(occupants.length === 0){
+    body = `No planets sit directly in this house — its story is shaped more by its sign and lord than by placement here.`;
+  } else {
+    const qualities = occupants.map(p=>PLANET_QUALITY[p]).join('; ');
+    body = `With ${occupants.join(', ')} placed here, this area is shaped by ${qualities}.`;
+  }
+  return `<div class="pred-card"><div class="pred-head"><div class="pred-icon"></div><div class="pred-title">${h}${ordinal(h)} &middot; ${theme.name}</div></div><div class="pred-body">${body}</div></div>`;
+}
+
+function ordinal(n){ return n===1?'st':n===2?'nd':n===3?'rd':'th'; }
+
+function houseSummary(h, label){
+  const occupants = CHART.houses[h];
+  if(occupants.length === 0) return `No planets occupy your ${label} house directly — its themes play out more subtly, through its ruling sign.`;
+  const qualities = occupants.map(p=>PLANET_QUALITY[p]).join('; ');
+  return `${occupants.join(' and ')} in your ${label} house, bringing ${qualities} into focus here.`;
+}
+
+const CATEGORIES = {
+  General: () => [
+    { title:"Character", body: ASC_TRAITS[SIGNS[CHART.ascSign]] },
+    { title:"Mind &amp; temperament", body: MOON_TRAITS[SIGNS[CHART.moonSign]] },
+    { title:"Currently running", body: `Your ${CHART.dashaLord} mahadasha is active — a period generally coloured by ${DASHA_THEME[CHART.dashaLord]}.` },
+    { title:"Overall", body: `With ${SIGNS[CHART.ascSign]} rising and Moon in ${SIGNS[CHART.moonSign]}, the outer approach and inner emotional world don't always move at the same pace — worth noticing where the two pull in different directions.` }
+  ],
+  Nakshatra: () => [
+    { title:`Birth nakshatra &middot; ${CHART.moonNak.name}`, body: NAK_TRAITS[CHART.moonNak.name] },
+    { title:`Pada ${CHART.moonNak.pada}`, body: `Falling in pada ${CHART.moonNak.pada} of ${CHART.moonNak.name} refines the nakshatra's general qualities toward the specific navamsha sign that pada falls in — a finer layer classical Jyotish reads alongside the main nakshatra traits.` }
+  ],
+  "House-wise": () => HOUSE_THEMES.map(t=>({ title:`${t.n}${ordinal(t.n)} &middot; ${t.name}`, body: CHART.houses[t.n].length===0 ? "No planets sit directly in this house — its story is shaped more by its sign and lord than by placement here." : `With ${CHART.houses[t.n].join(', ')} placed here, this area is shaped by ${CHART.houses[t.n].map(p=>PLANET_QUALITY[p]).join('; ')}.` })),
+  Health: () => [
+    { title:"6th house &middot; work &amp; health", body: houseSummary(6, '6th') },
+    { title:"8th house &middot; vitality &amp; stress", body: houseSummary(8, '8th') },
+    { title:"General note", body:"Classically the 6th and 8th houses are read together for health — the 6th for daily resilience and habits, the 8th for deeper or longer-running concerns. Treat this as a traditional lens, not medical guidance." }
+  ],
+  Career: () => [
+    { title:"10th house &middot; career &amp; standing", body: houseSummary(10, '10th') },
+    { title:"2nd house &middot; income", body: houseSummary(2, '2nd') },
+    { title:"11th house &middot; gains &amp; networks", body: houseSummary(11, '11th') }
+  ],
+  Relationships: () => [
+    { title:"7th house &middot; partnerships", body: houseSummary(7, '7th') },
+    { title:"5th house &middot; romance &amp; connection", body: houseSummary(5, '5th') }
+  ]
+};
+
+let activeCategory = "General";
+
+function renderCategoryTabs(){
+  const row = document.getElementById('catRow');
+  row.innerHTML = '';
+  Object.keys(CATEGORIES).forEach(cat=>{
+    const btn = document.createElement('button');
+    btn.className = 'cat' + (cat===activeCategory ? ' active' : '');
+    btn.textContent = cat;
+    btn.onclick = () => { activeCategory = cat; renderCategoryTabs(); renderCards(); };
+    row.appendChild(btn);
+  });
+}
+
+function renderCards(){
+  const grid = document.getElementById('predGrid');
+  const cards = CATEGORIES[activeCategory]();
+  grid.innerHTML = cards.map(c => `<div class="pred-card"><div class="pred-head"><div class="pred-icon"></div><div class="pred-title">${c.title}</div></div><div class="pred-body">${c.body}</div></div>`).join('');
+}
+
+function renderAll(name){
+  document.getElementById('pageSub').innerHTML = `${name} &middot; drawn from lagna, nakshatra, and house occupation.`;
+  renderCategoryTabs();
+  renderCards();
+}
+
+// --- Birth details form (shared pattern) ---------------------------------
+const CITIES = [
+  ["Agra, Uttar Pradesh", 27.1767, 78.0081],["Delhi", 28.6139, 77.2090],
+  ["Mumbai, Maharashtra", 19.0760, 72.8777],["Kolkata, West Bengal", 22.5726, 88.3639],
+  ["Chennai, Tamil Nadu", 13.0827, 80.2707],["Bengaluru, Karnataka", 12.9716, 77.5946],
+  ["Hyderabad, Telangana", 17.3850, 78.4867],["Koratla, Telangana", 18.8206, 78.7156],
+  ["Vizianagaram, Andhra Pradesh", 18.1067, 83.3956],["Visakhapatnam, Andhra Pradesh", 17.6868, 83.2185],
+  ["Ahmedabad, Gujarat", 23.0225, 72.5714],["Pune, Maharashtra", 18.5204, 73.8567],
+  ["Jaipur, Rajasthan", 26.9124, 75.7873],["Lucknow, Uttar Pradesh", 26.8467, 80.9462],
+  ["Nagpur, Maharashtra", 21.1458, 79.0882],["Bhopal, Madhya Pradesh", 23.2599, 77.4126],
+  ["Patna, Bihar", 25.5941, 85.1376],["Surat, Gujarat", 21.1702, 72.8311],
+  ["Kanpur, Uttar Pradesh", 26.4499, 80.3319],["Indore, Madhya Pradesh", 22.7196, 75.8577],
+  ["Varanasi, Uttar Pradesh", 25.3176, 82.9739],["Amritsar, Punjab", 31.6340, 74.8723],
+  ["Guwahati, Assam", 26.1445, 91.7362]
+];
+
+function initCitySelect(){
+  const sel = document.getElementById('bfCity');
+  CITIES.forEach((c,i)=>{
+    const o = document.createElement('option');
+    o.value = i; o.textContent = c[0] + ' (India, +5:30)';
+    sel.appendChild(o);
+  });
+  const other = document.createElement('option');
+  other.value = 'other'; other.textContent = 'Other — enter coordinates manually';
+  sel.appendChild(other);
+}
+
+function onCityChange(){
+  const val = document.getElementById('bfCity').value;
+  document.getElementById('bfManual').classList.toggle('show', val === 'other');
+}
+
+async function lookupPlace(){
+  const q = document.getElementById('bfPlaceSearch').value.trim();
+  const statusEl = document.getElementById('bfStatus');
+  if(!q){ statusEl.textContent = 'Type a place name first.'; statusEl.classList.add('err'); return; }
+  statusEl.textContent = `Searching for "${q}"…`;
+  statusEl.classList.remove('err');
+  try{
+    const res = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q), {
+      headers: { 'Accept-Language': 'en' }
+    });
+    if(!res.ok) throw new Error('lookup failed');
+    const data = await res.json();
+    if(!data || !data.length) throw new Error('not found');
+    const lat = parseFloat(data[0].lat), lon = parseFloat(data[0].lon);
+    document.getElementById('bfLat').value = lat.toFixed(4);
+    document.getElementById('bfLon').value = lon.toFixed(4);
+    const tzGuess = Math.round((lon/15) * 2) / 2;
+    document.getElementById('bfTz').value = tzGuess;
+    statusEl.textContent = `Found: ${data[0].display_name}. Timezone (${tzGuess >= 0 ? '+' : ''}${tzGuess}) is an estimate from longitude — adjust it if you know the exact local offset, then Generate.`;
+  } catch(e){
+    statusEl.textContent = `Couldn't find "${q}" — try a simpler name (just city + country), or enter latitude/longitude manually.`;
+    statusEl.classList.add('err');
+  }
+}
+
+function generateFromForm(){
+  const statusEl = document.getElementById('bfStatus');
+  try{
+    const name = document.getElementById('bfName').value.trim() || 'Your predictions';
+    const dateVal = document.getElementById('bfDate').value;
+    const timeVal = document.getElementById('bfTime').value;
+    if(!dateVal || !timeVal){ throw new Error('Please fill in the date and time of birth.'); }
+    const [y,m,d] = dateVal.split('-').map(Number);
+    const [hh,mm] = timeVal.split(':').map(Number);
+
+    const cityVal = document.getElementById('bfCity').value;
+    let lat, lon, tz;
+    if(cityVal === 'other'){
+      lat = parseFloat(document.getElementById('bfLat').value);
+      lon = parseFloat(document.getElementById('bfLon').value);
+      tz = parseFloat(document.getElementById('bfTz').value);
+      if(isNaN(lat) || isNaN(lon) || isNaN(tz)) throw new Error('Please enter latitude, longitude and timezone offset.');
+    } else {
+      const c = CITIES[parseInt(cityVal)];
+      lat = c[1]; lon = c[2]; tz = 5.5;
+    }
+
+    CHART = computeChartData(name, { year:y, month:m, day:d, hour:hh, minute:mm, tzOffset:tz, lat, lon });
+    renderAll(name);
+
+    statusEl.textContent = `Predictions generated for ${name}.`;
+    statusEl.classList.remove('err');
+  } catch(e){
+    statusEl.textContent = e.message || 'Something went wrong — please check the details and try again.';
+    statusEl.classList.add('err');
+  }
+}
+
+initCitySelect();
+
+let queryPlaceOverride = null;
+function applyQueryParams(){
+  const qs = new URLSearchParams(window.location.search);
+  if([...qs.keys()].length === 0) return;
+  if(qs.get('name')) document.getElementById('bfName').value = qs.get('name');
+  if(qs.get('date')) document.getElementById('bfDate').value = qs.get('date');
+  if(qs.get('time')) document.getElementById('bfTime').value = qs.get('time');
+  const lat = qs.get('lat'), lon = qs.get('lon'), tz = qs.get('tz'), place = qs.get('place');
+
+  if(lat && lon){
+    const latF = parseFloat(lat), lonF = parseFloat(lon);
+    const matchIdx = CITIES.findIndex(c => Math.abs(c[1]-latF) < 0.05 && Math.abs(c[2]-lonF) < 0.05);
+    if(matchIdx >= 0){ document.getElementById('bfCity').value = matchIdx; onCityChange(); }
+    else {
+      document.getElementById('bfCity').value = 'other'; onCityChange();
+      document.getElementById('bfLat').value = lat;
+      document.getElementById('bfLon').value = lon;
+      document.getElementById('bfTz').value = tz || '5.5';
+    }
+    generateFromForm();
+  } else if(place){
+    document.getElementById('bfCity').value = 'other';
+    onCityChange();
+    document.getElementById('bfPlaceSearch').value = place;
+    document.getElementById('bfStatus').textContent = `Looking up "${place}"…`;
+    lookupPlace().then(() => {
+      if(document.getElementById('bfLat').value) generateFromForm();
+    });
+  }
+}
+
+// initial demo (Cecil Gupta, matches kundli.html/dasha.html sample)
+CHART = computeChartData('Cecil Gupta', { year:1980, month:7, day:23, hour:0, minute:50, tzOffset:5.5, lat:27.1767, lon:78.0081 });
+renderAll('Cecil Gupta');
+applyQueryParams();
+</script>
 
 </body>
 </html>

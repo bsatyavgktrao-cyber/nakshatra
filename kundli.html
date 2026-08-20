@@ -155,6 +155,7 @@
     </div>
     <a href="#" class="btn-outline">Download full reading</a>
     <a href="dasha.html" id="viewDashaLink" class="btn-outline" style="margin-left:10px;">View Vimshottari dasha</a>
+    <a href="predictions.html" id="viewPredictionsLink" class="btn-outline" style="margin-left:10px;">View predictions</a>
   </div>
 
   <div class="tabs" id="tabRow"></div>
@@ -388,6 +389,7 @@ function generateFromForm(){
     dashaParams.set('lon', lon);
     dashaParams.set('tz', tz);
     document.getElementById('viewDashaLink').href = 'dasha.html?' + dashaParams.toString();
+    document.getElementById('viewPredictionsLink').href = 'predictions.html?' + dashaParams.toString();
 
     currentVarga = 0;
     document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active', i===0));
